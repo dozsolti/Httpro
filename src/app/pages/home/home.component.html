@@ -1,0 +1,11 @@
+<input type="text" [(ngModel)]="newPostForm.title" name="title"><br>
+<input type="text" [(ngModel)]="newPostForm.body" name="body"><br>
+<input type="number" [(ngModel)]="newPostForm.userId" name="userId"><br>
+
+<button (click)="SavePost()">Save</button>
+
+<hr>
+
+<pre>
+  {{posts.value | json}}
+</pre>
