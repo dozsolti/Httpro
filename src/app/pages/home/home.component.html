@@ -2,10 +2,35 @@
 <input type="text" [(ngModel)]="newPostForm.body" name="body"><br>
 <input type="number" [(ngModel)]="newPostForm.userId" name="userId"><br>
 
+<input type="file" (change)="setFile($event)">
 <button (click)="SavePost()">Save</button>
 
 <hr>
 
+<div *ngIf="posts.status()!=='value'">
+  <div class="alert">
+    {{posts.message}}
+  </div>
+</div>
+<div *ngIf="posts.status()==='value'">
+  <div *ngFor="let post of posts.value">
+    {{post}}
+  </div>
+</div>
+
+
+<div *ngIf="!posts.isGood()">
+  <div class="alert">
+    {{posts.message}}
+  </div>
+</div>
+<div *ngIf="posts.isGood()">
+  <div *ngFor="let post of posts.value">
+    {{post}}
+  </div>
+</div>
+
+
 <pre>
-  {{posts.value | json}}
+  {{posts | json}}
 </pre>
