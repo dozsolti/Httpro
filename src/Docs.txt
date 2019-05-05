@@ -1,0 +1,25 @@
+1. se pregatesc toate datele pentru request (.get()/.post()/.body() etc)
+
+2. console.error daca requestului ii lipsesc niste lucruri
+
+3. functia exec() va rula request intr-un observable si va tot emite date legate de request:
+
+- message
+-- Description: mesajul care trebuie pus in model
+-- Ex: { message : "Loading..." }
+
+- value
+-- Description: valoarea care trebuie pusa in model
+-- Ex: { value: [ 1,2,3 ] }
+
+- status
+-- Description: descrie statusul requestului
+-- Posibilities: "loading" || "completed"
+
+- isError
+-- (optional)
+-- Description: se pune doar in caz ca requestul nu s-a reusit SAU daca requestul a fost facut cu success dar in response primesti eroare. Fiindca model se va reseta la fiecare lucru emis din exec() isError:false va fii implicit.
+-- Ex: { isError: true }
+
+Flow din exec():
+- exec face requestul si cu functia DataFromReponse extrag datele si trimit mai departe un json care va fii prelucrat de functia DataToModel
