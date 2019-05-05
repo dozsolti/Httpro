@@ -59,16 +59,16 @@ export class Httpro {
       let value = "" + this.searchParams[key]
       realUrl.searchParams.append(key, value);
     }
-    console.log(this.files);
+
     if (this.files.length > 0)
       this.requestBodyType = BodyTypes.FORMDATA;
     let body = this.GetRealBody();
     //switch pe this.method
     switch (this.method) {
       case "get":
-        return this.http.get(realUrl.href, { headers: this.requestHeaders });
+        return this.http.get(realUrl.href, { headers: this.requestHeaders, observe: 'response' });
       case "post":
-        return this.http.post(realUrl.href, body, { headers: this.requestHeaders });
+        return this.http.post(realUrl.href, body, { headers: this.requestHeaders, observe: 'response' });
     }
   }
   //#endregion
@@ -132,19 +132,22 @@ export class Httpro {
     return new Promise(resolve => {
       return new Observable(observer => {
 
-        observer.next({ message: this.messages.loading });
+        observer.next({ message: this.messages.loading, status: "loading" });
 
         this.request()
           .subscribe(
             response => {
-              let responseKeys = Object.keys(response);
+
+              let body = response.body || {};
+
+              let bodyKeys = Object.keys(body);
               //empty result
-              if (responseKeys.length === 0) {
-                observer.next({ message: this.messages.empty });
+              if (bodyKeys.length === 0) {
+                observer.next({ message: this.messages.empty, status: "completed" });
                 return;
               }
 
-              observer.next(this.DataFromReponse(response))
+              observer.next(this.DataFromReponse(body))
 
             },
             err => observer.error(err),
@@ -192,14 +195,17 @@ export class Httpro {
 
   //Functioneaza pe responseuri cu date si cu sau fara campul de status
   private DataFromReponse(response) {
-    let wasSuccessed = false;
+    let hasSuccessed = true; //se incepe cu true si daca requestul are date(in result sau status code) care spune ca e false se va schimba
+    let hasError = false;
     let responseKeys = Object.keys(response);
 
     let value = null;
     //model contine tot in afara se campul de status
     if (responseKeys.indexOf('status') > -1) {
-      if (response['status'] === 'success')
-        wasSuccessed = true;
+      if (response['status'] !== 'success')
+        hasSuccessed = false;
+      if (response['status'] === 'error')
+        hasError = true;
       delete response['status'];
       responseKeys.splice(responseKeys.indexOf('status'), 1);
 
@@ -212,10 +218,10 @@ export class Httpro {
     else
       value = JSON.parse(JSON.stringify(response));
 
-    if (wasSuccessed)
-      return { value };
+    if (hasSuccessed)
+      return { value, hasError: hasError, status: "completed" };
     else
-      return { message: value };
+      return { message: value, hasError: hasError, status: "completed" };
   }
   /// data = { value: any, message: string }
   /// daca data.value = null valoarea din model va ramane cea default
@@ -227,6 +233,17 @@ export class Httpro {
     }
     if (data['value']) {
       this.model.value = data['value'];
+    }
+    if (data['hasError']) {
+      this.model.hasError = data['hasError'];
+    }
+
+    if (data['status']) {
+      let status = data['status'];
+      if (status === "loading")
+        this.model.isLoading = true;
+      else if (status === "completed")
+        this.model.isLoading = false;
     }
   }
   // error:String = "lorem ipsum"
