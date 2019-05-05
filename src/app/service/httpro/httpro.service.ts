@@ -135,6 +135,7 @@ export class Httpro {
         observer.next({ message: this.messages.loading, status: "loading" });
 
         this.request()
+
           .subscribe(
             response => {
 
@@ -161,7 +162,7 @@ export class Httpro {
           data => { this.DataToModel(data) },
           error => { this.ErrorToModel(error) },
           () => {
-            resolve(true);
+            resolve(this.model.hasError);
           }
         );
     });
