@@ -39,7 +39,7 @@ export class HTTProModel {
   ResetValue() {
     this.value = this.initialValue;
   }
-  public toDebugJSON() {
+  toDebugJSON() {
     return {
       message: this.message,
       hasError: this.hasError,
