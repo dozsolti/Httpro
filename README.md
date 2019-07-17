@@ -1,8 +1,8 @@
 # Httpro
-##Examples:
+## Examples:
 
 
-###Create a **GET** request
+### Create a **GET** request
 ```
     let modelPosts = new HTTProModel(null);
 
@@ -11,7 +11,7 @@
       .to(modelPosts)
       .exec()
 ```
-###Create a **GET** request with callbacks
+### Create a **GET** request with callbacks
 ```
     let model = new HTTProModel(null);
     await service
@@ -22,7 +22,7 @@
       })
       .exec()
 ```
-###Create a **POST** request
+### Create a **POST** request
 ```
     let model = new HTTProModel();
     service
