@@ -76,7 +76,7 @@ The first 2 is required!! This means ***get***(url), ***post***(url), ***put***(
 	 
  2. ***to***(model: HTTProModel): This will set model.
  3. ***exec***() : This will start/execute the request. In this way you can write a request and run it later. It returns a Promise with true or false, means request had success or not.
- 4. ***OnStart***(func), ***OnResponseGot***(func), ***OnEmptyResponse***(func), ***OnError***(func), ***OnSuccess***(func): With you can set the callbacks. *OnEmptyResponse()* will be called when the request has successed but the response's body is empty.
+ 4. ***OnStart***(func), ***OnResponseGot***(func), ***OnEmptyResponse***(func), ***OnError***(func), ***OnSuccess***(func): With you can set the callbacks. *OnEmptyResponse()* will be called when the request has succed but the response's body is empty.
 	 e.g. `.OnStart(() => { itStarted  =  true; })`
 	 **Note**: Only the OnError callback has parameter, the error message.
 
@@ -87,7 +87,7 @@ The first 2 is required!! This means ***get***(url), ***post***(url), ***put***(
  8. ***file***(fileName, file): It put the file in the array of files that will be send.
  9. ***useToken***(token  =  null): This will set the request token with the **parameter or will from localStorage**, with the key 'token'. 
  Basicly set the header.Authorization = "Bearer "+ token
- 10. ***map***(func): If the request successed the parameter will run over the response's value and setting to model's value. 
+ 10. ***map***(func): If the request succed the parameter will run over the response's value and setting to model's value. 
 
 ## HTTProModel
 
@@ -98,7 +98,7 @@ This contains informations about the request(current status) and the response(go
  1. ***value***: conatins the data from response( in some cases mapped)
  2. ***message***: if it success or not this will have informations about, the request/response as a string. For e.g. case like: "loading", "empty result" 
  3. It has 2 properties ***initialValue***, ***initialMessage***, what you can set on initiliazing the model. These will be later reused on the Reset() function.
- 4.  Properties about the current status: ***isWaiting***, ***isLoading***, ***isDone***, ***hasError***, ***hasSuccessed*** all these are boolean.
+ 4.  Properties about the current status: ***isWaiting***, ***isLoading***, ***isDone***, ***hasError***, ***hasSucced*** all these are boolean.
 
 ### HTTProModel functions
 

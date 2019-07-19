@@ -7,7 +7,7 @@ export class HTTProModel {
   isLoading: boolean;
   isDone: boolean;
   hasError: boolean;
-  hasSuccessed: boolean;
+  hasSucced: boolean;
 
 
   constructor(public initialValue: any = null, public initialMessage: string = "") {
@@ -21,7 +21,7 @@ export class HTTProModel {
       return "loading";
     if (this.hasError)
       return "error";
-    if (this.hasSuccessed)
+    if (this.hasSucced)
       return "success";
 
     return "";
@@ -34,7 +34,7 @@ export class HTTProModel {
     this.isLoading = false;
     this.isDone = false;
     this.hasError = false;
-    this.hasSuccessed = false;
+    this.hasSucced = false;
   }
   ResetValue() {
     this.value = this.initialValue;

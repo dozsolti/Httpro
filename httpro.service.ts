@@ -258,7 +258,7 @@ export class HTTPro {
               let data = this.ParseBody(body);
               this.model.Reset();
 
-              if (data.hasSuccessed) {
+              if (data.hasSucced) {
                 this.SetModelStatus("success");
                 let value = data.value;
                 if (this.mapFunc)
@@ -279,15 +279,15 @@ export class HTTPro {
             },
             () => {
               //When the request was done.
-              //When you're here, you can see if it has errors or not. If it has (from ErrorToModel) it means it wasn't successed
-              let successed = !this.model.hasError;
-              if (successed) {
+              //When you're here, you can see if it has errors or not. If it has (from ErrorToModel) it means it wasn't succed
+              let succed = !this.model.hasError;
+              if (succed) {
                 this.SetModelStatus('success');
                 //console.log("callback: OnSuccess");
                 if (this.callbacks.OnSuccess)
                   this.callbacks.OnSuccess();
               }
-              resolve(successed);
+              resolve(succed);
             }
           );
       } catch (error) {
@@ -300,14 +300,14 @@ export class HTTPro {
 
   //Functioneaza pe responseuri cu date si cu sau fara campul de status
   private ParseBody(body) {
-    let hasSuccessed = true; //se incepe cu true si daca requestul are date(in result sau status code) care spune ca e false se va schimba
+    let hasSucced = true; //se incepe cu true si daca requestul are date(in result sau status code) care spune ca e false se va schimba
     let responseKeys = Object.keys(body);
 
     let value = null;
     //model contine tot in afara se campul de status
     if (responseKeys.indexOf('status') > -1) {
       if (body['status'] !== 'success') {
-        hasSuccessed = false;
+        hasSucced = false;
       }
       delete body['status'];
       responseKeys.splice(responseKeys.indexOf('status'), 1);
@@ -315,10 +315,10 @@ export class HTTPro {
 
     value = { ...body };
 
-    if (hasSuccessed)
-      return { value, hasSuccessed };
+    if (hasSucced)
+      return { value, hasSucced };
     else
-      return { message: value, hasSuccessed };
+      return { message: value, hasSucced };
   }
 
   private ErrorToModel(error) {
@@ -333,7 +333,7 @@ export class HTTPro {
     this.model.isLoading = false;
     this.model.isDone = false;
     this.model.hasError = false;
-    this.model.hasSuccessed = false;
+    this.model.hasSucced = false;
 
     switch (status) {
       case "waiting":
@@ -348,7 +348,7 @@ export class HTTPro {
         break;
       case "success":
         this.model.isDone = true;
-        this.model.hasSuccessed = true;
+        this.model.hasSucced = true;
         break;
     }
   }

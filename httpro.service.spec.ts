@@ -90,8 +90,8 @@ describe('HTTPro Gets', () => {
        .get('https://mindtrip.ro/api/settings/')
        .to(model)
        .exec()
-       .then((hasSuccessed)=>{
-         console.log({hasSuccessed})
+       .then((hasSucced)=>{
+         console.log({hasSucced})
        })
        .catch(err=>{
          console.log({err})

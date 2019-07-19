@@ -41,7 +41,7 @@ describe('HTTProModel', () => {
 
     expect(model.isDone).toBe(false);
     expect(model.hasError).toBe(false);
-    expect(model.hasSuccessed).toBe(false);
+    expect(model.hasSucced).toBe(false);
   });
 
   it('should return the correct status', () => {
@@ -54,7 +54,7 @@ describe('HTTProModel', () => {
       expect(status).toEqual("loading");
     if (model.hasError)
       expect(status).toEqual("error");
-    if (model.hasSuccessed)
+    if (model.hasSucced)
       expect(status).toEqual("success");
   });
 
