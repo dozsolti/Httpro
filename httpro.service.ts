@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { HTTProConfig } from "./httpro.config";
 import { HTTProModel } from './httpro.model';
@@ -7,8 +7,8 @@ import { HTTProRequest } from './httpro.request';
 
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-
 export enum BodyTypes { JSON, FORMDATA };
+
 /*Todos:
 - get Horia's json to formData
 */
@@ -25,7 +25,6 @@ export class HTTPro {
     OnSuccess: null,
   }
   mapFunc = null;
-
   constructor(private http: HttpClient) { }
 
   get(url: string, ignoreBaseURl = false) {
@@ -220,10 +219,10 @@ export class HTTPro {
     }
   }
   exec() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
       try {
         if (this.CheckValidity() == false) {
-          resolve(false);
+          reject("Invalid HTTPro request");
           return;
         }
         //console.log("callback: OnStart");
@@ -233,7 +232,6 @@ export class HTTPro {
         this.model.Reset();
         this.SetModelStatus('loading');
         this.model.message = HTTProConfig.messages.loading;
-
         this.execRequest()
           .pipe(catchError(error => this.formatError(error)))
           .subscribe(
@@ -269,30 +267,30 @@ export class HTTPro {
                 this.model.message = data.message;
               }
 
+              //When the request was done.
+              //When you're here, you can see if it has errors or not. If it has (from ErrorToModel) it means it wasn't succed
+
+              this.SetModelStatus('success');
+              //console.log("callback: OnSuccess");
+              if (this.callbacks.OnSuccess)
+                this.callbacks.OnSuccess();
+
+              resolve(true);
+
             },
             error => {
+              console.log(error);
               //on error put it in model
               this.ErrorToModel(error);
               //console.log("callback: OnError");
               if (this.callbacks.OnError)
                 this.callbacks.OnError(error);
-            },
-            () => {
-              //When the request was done.
-              //When you're here, you can see if it has errors or not. If it has (from ErrorToModel) it means it wasn't succed
-              let succed = !this.model.hasError;
-              if (succed) {
-                this.SetModelStatus('success');
-                //console.log("callback: OnSuccess");
-                if (this.callbacks.OnSuccess)
-                  this.callbacks.OnSuccess();
-              }
-              resolve(succed);
+              reject(error);
             }
           );
       } catch (error) {
         this.logInternalError('custom', error);
-        resolve(false)
+        reject(error)
       }
 
     })
@@ -358,9 +356,10 @@ export class HTTPro {
       console.log("Error.: ", error);
 
     //daca este o eroare declansata de catre mine si nu de catre request.(Va contine mesajul)
-    if ((typeof error) === "string")
+    if (error instanceof String)
       return throwError(error);
-
+    if (error instanceof HttpErrorResponse)
+      return throwError(error.statusText)
     return throwError(HTTProConfig.messages.generalError);
   }
 
