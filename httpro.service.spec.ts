@@ -100,6 +100,17 @@ describe('HTTPro Gets', () => {
          expect(true).toBe(true);
        })
    });*/
+   
+   it('should handle status codes', async () => {
+    let model = new HTTProModel();
+    await service
+      .get('http://portal.replybee.ro/api/hola',true)
+      .to(model)
+      .exec()
+
+      console.log(model.toDebugJSON());
+    expect(model.hasError).toBe(true);
+  });
 
   it('should warn about unexisting model', async () => {
     let hasError = false;
@@ -153,7 +164,7 @@ describe('HTTPro Gets', () => {
   });
 })
 
-
+/*
 describe('HTTPro Post', () => {
   let service: HTTPro;
   beforeEach(() => {
@@ -196,4 +207,4 @@ describe('HTTPro Post', () => {
 
   });
 
-})
+})*/
