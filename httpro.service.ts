@@ -47,16 +47,16 @@ export class HTTPro {
     return this;
   }
 
-  setVariable(name,value) {
+  setVariable(name, value) {
     HTTPro.variables[name] = value;
   }
-  getVariable(name = null,defaultValue = null) {
+  getVariable(name = null, defaultValue = null) {
     if (name)
       if (name in HTTPro.variables)
         return HTTPro.variables[name];
     return defaultValue;
   }
-  
+
   private CreateRequest(method, url, ignoreBaseURl = false) {
     let _url = url;
     if (ignoreBaseURl == false)
@@ -225,13 +225,14 @@ export class HTTPro {
         this.callbacks.OnError("Request wasn't defined");
       return false;
     }
-    if (this.model == null) {
+    /*if (this.model == null) {
       this.logInternalError('no-model');
       if (this.callbacks.OnError)
         this.callbacks.OnError("Model wasn't defined");
       return false;
-    }
+    }*/
   }
+
   exec() {
     return new Promise((resolve, reject) => {
       try {
@@ -243,9 +244,11 @@ export class HTTPro {
         if (this.callbacks.OnStart)
           this.callbacks.OnStart();
 
-        this.model.Reset();
-        this.SetModelStatus('loading');
-        this.model.message = HTTProConfig.messages.loading;
+        if (this.model) {
+          this.model.Reset();
+          this.SetModelStatus('loading');
+          this.model.message = HTTProConfig.messages.loading;
+        }
         this.execRequest()
           .pipe(catchError(error => this.formatError(error)))
           .subscribe(
@@ -262,40 +265,53 @@ export class HTTPro {
                 //console.log("callback: OnEmptyResponse");
                 if (this.callbacks.OnEmptyResponse)
                   this.callbacks.OnEmptyResponse();
-                this.SetModelStatus('success');
-                this.model.message = HTTProConfig.messages.empty;
-                return;
+                if (this.model) {
+                  this.SetModelStatus('success');
+                  this.model.message = HTTProConfig.messages.empty;
+                  resolve(true)
+                  return;
+                }
+                if (this.model == null)
+                  resolve(body);
               }
 
               let data = this.ParseBody(body);
-              this.model.Reset();
+              if (this.model)
+                this.model.Reset();
 
               if (data.hasSucced) {
-                this.SetModelStatus("success");
                 let value = data.value;
+
                 if (this.mapFunc)
                   value = this.mapFunc(data.value);
-                this.model.value = value;
+
+                if (this.model) {
+                  this.SetModelStatus("success");
+                  this.model.value = value;
+                }
+
+                if (this.callbacks.OnSuccess)
+                  this.callbacks.OnSuccess();
+
+                if (this.model)
+                  resolve(true);
+                if (this.model == null)
+                  resolve(value);
+
               } else {
-                this.SetModelStatus("error");
-                this.model.message = data.message;
+                if (this.model) {
+                  this.SetModelStatus("error");
+                  this.model.message = data.message;
+                }
+                reject(data.message)
               }
-
-              //When the request was done.
-              //When you're here, you can see if it has errors or not. If it has (from ErrorToModel) it means it wasn't succed
-
-              this.SetModelStatus('success');
-              //console.log("callback: OnSuccess");
-              if (this.callbacks.OnSuccess)
-                this.callbacks.OnSuccess();
-
-              resolve(true);
-
             },
             error => {
               console.log(error);
-              //on error put it in model
-              this.ErrorToModel(error);
+              if (this.model) {
+                //on error put it in model
+                this.ErrorToModel(error);
+              }
               //console.log("callback: OnError");
               if (this.callbacks.OnError)
                 this.callbacks.OnError(error);
