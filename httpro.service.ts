@@ -25,6 +25,9 @@ export class HTTPro {
     OnSuccess: null,
   }
   mapFunc = null;
+
+  static variables: any = {};
+
   constructor(private http: HttpClient) { }
 
   get(url: string, ignoreBaseURl = false) {
@@ -44,6 +47,16 @@ export class HTTPro {
     return this;
   }
 
+  setVariable(name,value) {
+    HTTPro.variables[name] = value;
+  }
+  getVariable(name = null,defaultValue = null) {
+    if (name)
+      if (name in HTTPro.variables)
+        return HTTPro.variables[name];
+    return defaultValue;
+  }
+  
   private CreateRequest(method, url, ignoreBaseURl = false) {
     let _url = url;
     if (ignoreBaseURl == false)
@@ -139,6 +152,7 @@ export class HTTPro {
     }
     return this;
   }
+
   private CheckRequest() {
     let existsRequest = this.request != null;
     if (existsRequest)
