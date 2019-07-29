@@ -225,12 +225,6 @@ export class HTTPro {
         this.callbacks.OnError("Request wasn't defined");
       return false;
     }
-    /*if (this.model == null) {
-      this.logInternalError('no-model');
-      if (this.callbacks.OnError)
-        this.callbacks.OnError("Model wasn't defined");
-      return false;
-    }*/
   }
 
   exec() {
@@ -252,7 +246,7 @@ export class HTTPro {
         this.execRequest()
           .pipe(catchError(error => this.formatError(error)))
           .subscribe(
-            (response) => {
+            (response:any) => {
               //console.log("callback: OnResponseGot");
               if (this.callbacks.OnResponseGot)
                 this.callbacks.OnResponseGot();
@@ -307,7 +301,6 @@ export class HTTPro {
               }
             },
             error => {
-              console.log(error);
               if (this.model) {
                 //on error put it in model
                 this.ErrorToModel(error);
@@ -388,8 +381,12 @@ export class HTTPro {
     //daca este o eroare declansata de catre mine si nu de catre request.(Va contine mesajul)
     if (error instanceof String)
       return throwError(error);
-    if (error instanceof HttpErrorResponse)
-      return throwError(error.statusText)
+    if (error instanceof HttpErrorResponse){
+      if(error.status.toString() in HTTProConfig.messages.errors)
+        return throwError(HTTProConfig.messages.errors[error.status.toString()]);
+      else
+        return throwError(error.statusText)
+    }
     return throwError(HTTProConfig.messages.generalError);
   }
 
