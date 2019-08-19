@@ -1,3 +1,5 @@
+export enum BodyTypes { JSON, FORMDATA };
+
 export let HTTProConfig = {
     //baseURL:'',
     //baseURL:'https://mindtrip.ro/api',

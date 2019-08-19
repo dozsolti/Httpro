@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
-import { HTTProConfig } from "./httpro.config";
+import { HTTProConfig, BodyTypes } from "./httpro.config";
 import { HTTProModel } from './httpro.model';
 import { HTTProRequest } from './httpro.request';
 
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-export enum BodyTypes { JSON, FORMDATA };
+
 
 /*Todos:
 - get Horia's json to formData

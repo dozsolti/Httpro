@@ -1,4 +1,5 @@
-import { BodyTypes } from './httpro.service';
+import { BodyTypes } from "./httpro.config";
+
 
 export class HTTProRequest {
 
