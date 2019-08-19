@@ -8,14 +8,9 @@ import { HTTProRequest } from './httpro.request';
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
-
-/*Todos:
-- get Horia's json to formData
-*/
 @Injectable()
 export class HTTPro {
 
-  model: HTTProModel = null;
   request: HTTProRequest = null;
   callbacks = {
     OnStart: null,
@@ -167,11 +162,6 @@ export class HTTPro {
     this.mapFunc = func;
     return this;
   }
-  to(model: HTTProModel) {
-    this.model = model;
-    return this;
-  }
-
   private execRequest() {
     let realUrl = new URL(this.request.url);
     for (let key in this.request.searchParams) {
@@ -227,7 +217,8 @@ export class HTTPro {
     }
   }
 
-  exec() {
+  exec(model = null) {
+    
     return new Promise((resolve, reject) => {
       try {
         if (this.CheckValidity() == false) {
@@ -238,10 +229,10 @@ export class HTTPro {
         if (this.callbacks.OnStart)
           this.callbacks.OnStart();
 
-        if (this.model) {
-          this.model.Reset();
-          this.SetModelStatus('loading');
-          this.model.message = HTTProConfig.messages.loading;
+        if (model) {
+          model.Reset();
+          this.SetModelStatus(model,'loading');
+          model.message = HTTProConfig.messages.loading;
         }
         this.execRequest()
           .pipe(catchError(error => this.formatError(error)))
@@ -259,19 +250,19 @@ export class HTTPro {
                 //console.log("callback: OnEmptyResponse");
                 if (this.callbacks.OnEmptyResponse)
                   this.callbacks.OnEmptyResponse();
-                if (this.model) {
-                  this.SetModelStatus('success');
-                  this.model.message = HTTProConfig.messages.empty;
+                if (model) {
+                  this.SetModelStatus(model,'success');
+                  model.message = HTTProConfig.messages.empty;
                   resolve(true)
                   return;
                 }
-                if (this.model == null)
+                if (model == null)
                   resolve(body);
               }
 
               let data = this.ParseBody(body);
-              if (this.model)
-                this.model.Reset();
+              if (model)
+                model.Reset();
 
               if (data.hasSucced) {
                 let value = data.value;
@@ -279,31 +270,31 @@ export class HTTPro {
                 if (this.mapFunc)
                   value = this.mapFunc(data.value);
 
-                if (this.model) {
-                  this.SetModelStatus("success");
-                  this.model.value = value;
+                if (model) {
+                  this.SetModelStatus(model,"success");
+                  model.value = value;
                 }
 
                 if (this.callbacks.OnSuccess)
                   this.callbacks.OnSuccess();
 
-                if (this.model)
+                if (model)
                   resolve(true);
-                if (this.model == null)
+                if (model == null)
                   resolve(value);
 
               } else {
-                if (this.model) {
-                  this.SetModelStatus("error");
-                  this.model.message = data.message;
+                if (model) {
+                  this.SetModelStatus(model,"error");
+                  model.message = data.message;
                 }
                 reject(data.message)
               }
             },
             error => {
-              if (this.model) {
+              if (model) {
                 //on error put it in model
-                this.ErrorToModel(error);
+                this.ErrorToModel(model,error);
               }
               //console.log("callback: OnError");
               if (this.callbacks.OnError)
@@ -342,34 +333,34 @@ export class HTTPro {
       return { message: value, hasSucced };
   }
 
-  private ErrorToModel(error) {
-    this.model.Reset();
-    this.model.message = error;
-    this.SetModelStatus('error');
+  private ErrorToModel(model,error) {
+    model.Reset();
+    model.message = error;
+    this.SetModelStatus(model,'error');
   }
 
 
-  private SetModelStatus(status) {
-    this.model.isWaiting = false;
-    this.model.isLoading = false;
-    this.model.isDone = false;
-    this.model.hasError = false;
-    this.model.hasSucced = false;
+  private SetModelStatus(model,status) {
+    model.isWaiting = false;
+    model.isLoading = false;
+    model.isDone = false;
+    model.hasError = false;
+    model.hasSucced = false;
 
     switch (status) {
       case "waiting":
-        this.model.isWaiting = true;
+        model.isWaiting = true;
         break;
       case "loading":
-        this.model.isLoading = true;
+        model.isLoading = true;
         break;
       case "error":
-        this.model.isDone = true;
-        this.model.hasError = true;
+        model.isDone = true;
+        model.hasError = true;
         break;
       case "success":
-        this.model.isDone = true;
-        this.model.hasSucced = true;
+        model.isDone = true;
+        model.hasSucced = true;
         break;
     }
   }
@@ -390,10 +381,9 @@ export class HTTPro {
     return throwError(HTTProConfig.messages.generalError);
   }
 
-  private logInternalError(type: 'no-request' | 'no-model' | 'custom' | 'general' = 'general', customMessage = '') {
+  private logInternalError(type: 'no-request' | 'custom' | 'general' = 'general', customMessage = '') {
     let errors = {
       'no-request': `You have to define the request first.\n Use: .get(url), .post(url), .put(url) or .delete(url)`,
-      'no-model': `You have to define the model first.\n Use: .to(model: HTTProModel)`,
       general: 'Something went wrong'
     }
     if (type == 'custom')
