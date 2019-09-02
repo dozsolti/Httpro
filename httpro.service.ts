@@ -2,15 +2,19 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 
 import { HTTProConfig, BodyTypes } from "./httpro.config";
-import { HTTProModel } from './httpro.model';
 import { HTTProRequest } from './httpro.request';
 
 import { throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 
+
+/*Todos:
+- get Horia's json to formData
+*/
 @Injectable()
 export class HTTPro {
 
+  //model: HTTProModel = null;
   request: HTTProRequest = null;
   callbacks = {
     OnStart: null,
@@ -26,20 +30,16 @@ export class HTTPro {
   constructor(private http: HttpClient) { }
 
   get(url: string, ignoreBaseURl = false) {
-    this.CreateRequest('get', url, ignoreBaseURl);
-    return this;
+    return this.CreateRequest('get', url, ignoreBaseURl);
   }
   post(url: string, ignoreBaseURl = false) {
-    this.CreateRequest("post", url, ignoreBaseURl);
-    return this;
+    return this.CreateRequest("post", url, ignoreBaseURl);
   }
   put(url: string, ignoreBaseURl = false) {
-    this.CreateRequest("put", url, ignoreBaseURl);
-    return this;
+    return this.CreateRequest("put", url, ignoreBaseURl);
   }
   delete(url: string, ignoreBaseURl = false) {
-    this.CreateRequest("delete", url, ignoreBaseURl);
-    return this;
+    return this.CreateRequest("delete", url, ignoreBaseURl);
   }
 
   setVariable(name, value) {
@@ -53,19 +53,23 @@ export class HTTPro {
   }
 
   private CreateRequest(method, url, ignoreBaseURl = false) {
+    
     let _url = url;
     if (ignoreBaseURl == false)
-      _url = HTTProConfig.baseURL + url;
-    this.request = new HTTProRequest(method, _url);
+    _url = HTTProConfig.baseURL + url;
 
-    this.callbacks = {
+    let newHTTPro = new HTTPro(this.http);
+    newHTTPro.request = new HTTProRequest(method, _url);
+
+    newHTTPro.callbacks = {
       OnStart: null,
       OnResponseGot: null,
       OnEmptyResponse: null,
       OnError: null,
       OnSuccess: null,
     }
-    this.mapFunc = null;
+    newHTTPro.mapFunc = null;
+    return newHTTPro;
   }
 
   //#region Request content
@@ -92,13 +96,13 @@ export class HTTPro {
 
   query(query) {
     if (this.CheckRequest()) {
-      this.request.searchParams = { ...query };
+      this.request.searchParams = { ...this.request.searchParams, ...query };
     }
     return this;
   }
   body(body: Object) {
     if (this.CheckRequest()) {
-      this.request.body = { ...body };
+      this.request.body = { ...this.request.body, ...body };
     }
     return this;
   }
@@ -219,7 +223,7 @@ export class HTTPro {
 
   exec(model = null) {
     
-    return new Promise((resolve, reject) => {
+    return new Promise<any>((resolve, reject) => {
       try {
         if (this.CheckValidity() == false) {
           reject("Invalid HTTPro request");
@@ -267,8 +271,9 @@ export class HTTPro {
               if (data.hasSucced) {
                 let value = data.value;
 
-                if (this.mapFunc)
+                if (this.mapFunc){
                   value = this.mapFunc(data.value);
+                }
 
                 if (model) {
                   this.SetModelStatus(model,"success");
@@ -330,7 +335,10 @@ export class HTTPro {
     if (hasSucced)
       return { value, hasSucced };
     else
-      return { message: value, hasSucced };
+      if(responseKeys.length==1)
+        return { message: value[responseKeys[0]], hasSucced };
+      else
+        return { message: value, hasSucced };
   }
 
   private ErrorToModel(model,error) {

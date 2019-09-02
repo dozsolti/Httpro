@@ -1,9 +1,7 @@
 export enum BodyTypes { JSON, FORMDATA };
 
 export let HTTProConfig = {
-    //baseURL:'',
-    //baseURL:'https://mindtrip.ro/api',
-    baseURL: `https://jsonplaceholder.typicode.com`,
+    baseURL:'',
     logTheError: true,
     messages:{
         loading: "Loading...",
