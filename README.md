@@ -10,8 +10,7 @@ I focused on the **friendly syntax**  and being able to **handle easier the inpu
 let modelPosts = new HTTProModel([]);
 this.httpro
 	.get('/posts')
-	.to(modelPosts)
-	.exec()
+	.exec(modelPosts)
 	
 ```
 
@@ -20,11 +19,10 @@ this.httpro
 let modelPosts = new HTTProModel([]);
 this.httpro
 	.get('/posts')
-	.to(modelPosts)
 	.OnStart(() => {
 		//Do stuff
 	})
-	.exec()
+	.exec(modelPosts)
 	
 ```
 ### Create a **POST** request
@@ -39,11 +37,10 @@ this.httpro
 		body: 'bar',
 		userId: 1
 	})
-	.to(model)
 	.OnSuccess(()=>{
 		console.log(model.toDebugJSON())
 	})
-	.exec()
+	.exec(model)
 
 ```
 
@@ -62,8 +59,7 @@ Now we have all that we need for the request let's assemble it:
 
     this.httpro
 	    .get("https://jsonplaceholder.typicode.com/posts")
-	    .to(model)
-	    .exec();
+	    .exec(model);
 **Note:** You have to call exec() function to *execute* the request.
 
 **That was it !!** Now the model will contain all the informations you will need.
@@ -74,20 +70,19 @@ The first 2 is required!! This means ***get***(url), ***post***(url), ***put***(
  1. ***get***(url), ***post***(url), ***put***(url), ***delete***(url) : These will initialize the request with the methode and url, **it  should be the first** in the chain. It has a second parameter called *ignoreBaseURl* by default it is false, but when it is true ignores the baseURL from configuration, *the url becoming an absolute path*.
 	 e.g. `this.httpro.put('/user/3')`
 	 
- 2. ***to***(model: HTTProModel): This will set model.
- 3. ***exec***() : This will start/execute the request. In this way you can write a request and run it later. It returns a Promise with true or false, means request had success or not.
- 4. ***OnStart***(func), ***OnResponseGot***(func), ***OnEmptyResponse***(func), ***OnError***(func), ***OnSuccess***(func): With you can set the callbacks. *OnEmptyResponse()* will be called when the request has succed but the response's body is empty.
+ 2. ***exec***(model = null) : This will start/execute the request. In this way you can write a request and run it later. It returns a Promise with true on .then() if it succeded and false on .catch() for errors ***IF*** you have a model in argument, otherwise the then callback will contain the result from the request and the catch callback will contain the errors.
+ 3. ***OnStart***(func), ***OnResponseGot***(func), ***OnEmptyResponse***(func), ***OnError***(func), ***OnSuccess***(func): With you can set the callbacks. *OnEmptyResponse()* will be called when the request has succed but the response's body is empty.
 	 e.g. `.OnStart(() => { itStarted  =  true; })`
 	 **Note**: Only the OnError callback has parameter, the error message.
 
- 5. ***headers***(headers): It sets the request's headers.
- 6. ***query***(query): It sets queryParams of the request. Those in the url after the question mark(?)
- 7. ***body***(body): It sets the body that will be send.
+ 4. ***headers***(headers): It sets the request's headers.
+ 5. ***query***(query): It sets queryParams of the request. Those in the url after the question mark(?)
+ 6. ***body***(body): It sets the body that will be send.
   **Note** headers, query and body it recieves an Object as a parameter ({key: value}). If the key already exists the value will be override, but it it not exists it will add it to rest.
- 8. ***file***(fileName, file): It put the file in the array of files that will be send.
- 9. ***useToken***(token  =  null): This will set the request token with the **parameter or will from localStorage**, with the key 'token'. 
+ 7. ***file***(fileName, file): It put the file in the array of files that will be send.
+ 8. ***useToken***(token  =  null): This will set the request token with the **parameter or will from localStorage**, with the key 'token'. 
  Basicly set the header.Authorization = "Bearer "+ token
- 10. ***map***(func): If the request succed the parameter will run over the response's value and setting to model's value. 
+ 9. ***map***(func): If the request succed the parameter will run over the response's value and setting to model's value. 
 
 ## HTTProModel
 
