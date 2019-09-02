@@ -143,7 +143,12 @@ export class HTTPro {
     if (this.CheckRequest()) {
       let _token;
       if (token === null)
-        _token = localStorage.getItem("token");
+      {
+        if(this.getVariable('token'))
+          _token = this.getVariable();
+        else
+          _token = localStorage.getItem("token");
+      }
       else
         _token = token;
 
