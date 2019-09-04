@@ -58,7 +58,7 @@ So we already have the **what** and the **where**, we only need the **HTTPro mod
 Now we have all that we need for the request let's assemble it:
 
     this.httpro
-	    .get("https://jsonplaceholder.typicode.com/posts")
+	    .get("https://jsonplaceholder.typicode.com/posts",true)
 	    .exec(model);
 **Note:** You have to call exec() function to *execute* the request.
 
