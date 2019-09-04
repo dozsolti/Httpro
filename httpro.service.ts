@@ -145,7 +145,7 @@ export class HTTPro {
       if (token === null)
       {
         if(this.getVariable('token'))
-          _token = this.getVariable();
+          _token = this.getVariable('token');
         else
           _token = localStorage.getItem("token");
       }
